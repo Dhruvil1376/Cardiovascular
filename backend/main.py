@@ -32,15 +32,17 @@ app = FastAPI(
     version="1.0.0",
 )
 
-# Comma separated list of allowed origins, e.g.
+# Comma separated list of allowed origins, or '*' for all origins
 #   ALLOWED_ORIGINS="https://your-frontend.vercel.app,http://localhost:5173"
-raw_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173")
+raw_origins = os.getenv("ALLOWED_ORIGINS", "*")
 ALLOWED_ORIGINS = [origin.strip() for origin in raw_origins.split(",") if origin.strip()]
+
+allow_all = "*" in ALLOWED_ORIGINS
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=ALLOWED_ORIGINS,
-    allow_credentials=True,
+    allow_origins=["*"] if allow_all else ALLOWED_ORIGINS,
+    allow_credentials=not allow_all,
     allow_methods=["*"],
     allow_headers=["*"],
 )
